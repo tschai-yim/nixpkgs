@@ -6,7 +6,6 @@ let
   pkg = cfg.package;
 
   defaultUser = "paperless";
-  nltkDir = "/var/cache/paperless/nltk";
   defaultFont = "${pkgs.liberation_ttf}/share/fonts/truetype/LiberationSerif-Regular.ttf";
 
   # Don't start a redis instance if the user sets a custom redis connection
@@ -17,13 +16,19 @@ let
     PAPERLESS_DATA_DIR = cfg.dataDir;
     PAPERLESS_MEDIA_ROOT = cfg.mediaDir;
     PAPERLESS_CONSUMPTION_DIR = cfg.consumptionDir;
-    PAPERLESS_NLTK_DIR = nltkDir;
     PAPERLESS_THUMBNAIL_FONT_NAME = defaultFont;
     GUNICORN_CMD_ARGS = "--bind=${cfg.address}:${toString cfg.port}";
   } // optionalAttrs (config.time.timeZone != null) {
     PAPERLESS_TIME_ZONE = config.time.timeZone;
   } // optionalAttrs enableRedis {
     PAPERLESS_REDIS = "unix://${redisServer.unixSocket}";
+  } // optionalAttrs (cfg.settings.PAPERLESS_ENABLE_NLTK or true) {
+    PAPERLESS_NLTK_DIR = pkgs.symlinkJoin {
+      name = "paperless_ngx_nltk_data";
+      paths = pkg.nltkData;
+    };
+  } // optionalAttrs (cfg.openMPThreadingWorkaround) {
+    OMP_NUM_THREADS = "1";
   } // (lib.mapAttrs (_: s:
     if (lib.isAttrs s || lib.isList s) then builtins.toJSON s
     else if lib.isBool s then lib.boolToString s
@@ -141,12 +146,12 @@ in
         `''${dataDir}/paperless-manage createsuperuser`.
 
         The default superuser name is `admin`. To change it, set
-        option {option}`extraConfig.PAPERLESS_ADMIN_USER`.
+        option {option}`settings.PAPERLESS_ADMIN_USER`.
         WARNING: When changing the superuser name after the initial setup, the old superuser
         will continue to exist.
 
         To disable login for the web interface, set the following:
-        `extraConfig.PAPERLESS_AUTO_LOGIN_USERNAME = "admin";`.
+        `settings.PAPERLESS_AUTO_LOGIN_USERNAME = "admin";`.
         WARNING: Only use this on a trusted system without internet access to Paperless.
       '';
     };
@@ -196,6 +201,20 @@ in
     };
 
     package = mkPackageOption pkgs "paperless-ngx" { };
+
+    openMPThreadingWorkaround = mkEnableOption ''
+      a workaround for document classifier timeouts.
+
+      Paperless uses OpenBLAS via scikit-learn for document classification.
+
+      The default is to use threading for OpenMP but this would cause the
+      document classifier to spin on one core seemingly indefinitely if there
+      are large amounts of classes per classification; causing it to
+      effectively never complete due to running into timeouts.
+
+      This sets `OMP_NUM_THREADS` to `1` in order to mitigate the issue. See
+      https://github.com/NixOS/nixpkgs/issues/240591 for more information.
+    '' // mkOption { default = true; };
   };
 
   config = mkIf cfg.enable {
@@ -292,22 +311,6 @@ in
       };
     };
 
-    # Download NLTK corpus data
-    systemd.services.paperless-download-nltk-data = {
-      wantedBy = [ "paperless-scheduler.service" ];
-      before = [ "paperless-scheduler.service" ];
-      after = [ "network-online.target" ];
-      serviceConfig = defaultServiceConfig // {
-        User = cfg.user;
-        Type = "oneshot";
-        # Enable internet access
-        PrivateNetwork = false;
-        ExecStart = let pythonWithNltk = pkg.python.withPackages (ps: [ ps.nltk ]); in ''
-          ${pythonWithNltk}/bin/python -m nltk.downloader -d '${nltkDir}' punkt snowball_data stopwords
-        '';
-      };
-    };
-
     systemd.services.paperless-consumer = {
       description = "Paperless document consumer";
       # Bind to `paperless-scheduler` so that the consumer never runs
@@ -320,6 +323,9 @@ in
         Restart = "on-failure";
       };
       environment = env;
+      # Allow the consumer to access the private /tmp directory of the server.
+      # This is required to support consuming files via a local folder.
+      unitConfig.JoinsNamespaceOf = "paperless-task-queue.service";
     };
 
     systemd.services.paperless-web = {
@@ -352,6 +358,7 @@ in
         User = cfg.user;
         Restart = "on-failure";
 
+        LimitNOFILE = 65536;
         # gunicorn needs setuid, liblapack needs mbind
         SystemCallFilter = defaultServiceConfig.SystemCallFilter ++ [ "@setuid mbind" ];
         # Needs to serve web page

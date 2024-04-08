@@ -10,12 +10,13 @@
 , pytest-asyncio
 , requests
 , pythonOlder
+, setuptools
 }:
 
 buildPythonPackage rec {
   pname = "pubnub";
-  version = "7.3.2";
-  format = "setuptools";
+  version = "7.4.3";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
@@ -23,10 +24,14 @@ buildPythonPackage rec {
     owner = pname;
     repo = "python";
     rev = "refs/tags/v${version}";
-    hash = "sha256-J6vwdOI/GM/K0TxRwIgkXibNAc+n9wVCpmMkzMhBepw=";
+    hash = "sha256-t3lNotfT3C2hv5AGPWZpL3wN68m8HRcjsccUz8QcY5I=";
   };
 
-  propagatedBuildInputs = [
+  build-system = [
+    setuptools
+  ];
+
+  dependencies = [
     aiohttp
     cbor2
     pycryptodomex

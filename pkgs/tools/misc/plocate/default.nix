@@ -10,12 +10,12 @@
 }:
 stdenv.mkDerivation rec {
   pname = "plocate";
-  version = "1.1.20";
+  version = "1.1.22";
 
   src = fetchgit {
     url = "https://git.sesse.net/plocate";
     rev = version;
-    sha256 = "sha256-Nc39wPVW+GpmT8X8q/VbrPhPxO/PgFBPTOCWAkkUfDY=";
+    sha256 = "sha256-ejv1IsjbImnvI1oorvMoIvTBu3HuVy7VtgHNTIkqqro=";
   };
 
   postPatch = ''
@@ -32,6 +32,9 @@ stdenv.mkDerivation rec {
     "-Dsharedstatedir=/var/cache"
     "-Ddbpath=locatedb"
   ];
+
+  # https://github.com/NixOS/nixpkgs/issues/300635
+  postInstall = ''chmod -R u-s,g-s "$out"'';
 
   meta = with lib; {
     description = "Much faster locate";

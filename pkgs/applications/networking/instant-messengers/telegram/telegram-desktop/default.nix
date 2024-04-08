@@ -30,7 +30,6 @@
 , range-v3
 , tl-expected
 , hunspell
-, glibmm_2_68
 , webkitgtk_6_0
 , jemalloc
 , rnnoise
@@ -64,14 +63,14 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "telegram-desktop";
-  version = "4.14.3";
+  version = "4.16.1";
 
   src = fetchFromGitHub {
     owner = "telegramdesktop";
     repo = "tdesktop";
     rev = "v${version}";
     fetchSubmodules = true;
-    hash = "sha256-xFbS8nhtWzIu+b/Hlnvtp925cf8UuBDywNnq5spMQ5Q=";
+    hash = "sha256-sb7BpEIjSJS4ntv8s0RSJAj4BhTgHF7fEei5QXl60mA=";
   };
 
   patches = [
@@ -87,13 +86,16 @@ stdenv.mkDerivation rec {
 
   postPatch = lib.optionalString stdenv.isLinux ''
     substituteInPlace Telegram/ThirdParty/libtgvoip/os/linux/AudioInputALSA.cpp \
-      --replace '"libasound.so.2"' '"${alsa-lib}/lib/libasound.so.2"'
+      --replace-fail '"libasound.so.2"' '"${alsa-lib}/lib/libasound.so.2"'
     substituteInPlace Telegram/ThirdParty/libtgvoip/os/linux/AudioOutputALSA.cpp \
-      --replace '"libasound.so.2"' '"${alsa-lib}/lib/libasound.so.2"'
+      --replace-fail '"libasound.so.2"' '"${alsa-lib}/lib/libasound.so.2"'
     substituteInPlace Telegram/ThirdParty/libtgvoip/os/linux/AudioPulse.cpp \
-      --replace '"libpulse.so.0"' '"${libpulseaudio}/lib/libpulse.so.0"'
+      --replace-fail '"libpulse.so.0"' '"${libpulseaudio}/lib/libpulse.so.0"'
     substituteInPlace Telegram/lib_webview/webview/platform/linux/webview_linux_webkitgtk_library.cpp \
-      --replace '"libwebkitgtk-6.0.so.4"' '"${webkitgtk_6_0}/lib/libwebkitgtk-6.0.so.4"'
+      --replace-fail '"libwebkitgtk-6.0.so.4"' '"${webkitgtk_6_0}/lib/libwebkitgtk-6.0.so.4"'
+  '' + lib.optionalString stdenv.isDarwin ''
+    substituteInPlace Telegram/lib_webrtc/webrtc/platform/mac/webrtc_environment_mac.mm \
+      --replace-fail kAudioObjectPropertyElementMain kAudioObjectPropertyElementMaster
   '';
 
   # We want to run wrapProgram manually (with additional parameters)
@@ -141,7 +143,6 @@ stdenv.mkDerivation rec {
     libpulseaudio
     pipewire
     hunspell
-    glibmm_2_68
     webkitgtk_6_0
     jemalloc
   ] ++ lib.optionals stdenv.isDarwin (with darwin.apple_sdk_11_0.frameworks; [

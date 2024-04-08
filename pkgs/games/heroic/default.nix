@@ -17,18 +17,18 @@
 let appName = "heroic";
 in stdenv.mkDerivation rec {
   pname = "heroic-unwrapped";
-  version = "2.11.0";
+  version = "2.14.0";
 
   src = fetchFromGitHub {
     owner = "Heroic-Games-Launcher";
     repo = "HeroicGamesLauncher";
     rev = "v${version}";
-    hash = "sha256-N+9wNlDARE1zdXW/vka6whFNu5CF240zCJ00EDT1cM0=";
+    hash = "sha256-EARNmvzOOE/AAQKqiXZhhCf2A/j9Cn2BRV9Yc0ezKfE=";
   };
 
   offlineCache = fetchYarnDeps {
     yarnLock = "${src}/yarn.lock";
-    hash = "sha256-P7Mm9TMNjr2glLQppjJZRMeN9sYKyZWzRaerZIcY3Y8=";
+    hash = "sha256-3CYSw1Qy363eyhy3UyFgihSau+miNHwvKjhlq/kWxWQ=";
   };
 
   nativeBuildInputs = [

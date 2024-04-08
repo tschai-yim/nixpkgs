@@ -2,29 +2,34 @@
 , rustPlatform
 , fetchFromGitHub
 , stdenv
+, installShellFiles
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "ast-grep";
-  version = "0.16.1";
+  version = "0.20.2";
 
   src = fetchFromGitHub {
     owner = "ast-grep";
     repo = "ast-grep";
     rev = version;
-    hash = "sha256-QjwtffTFxmsj+3UaLphBldK0SVJBaeOQrfUNbIwNpAo=";
+    hash = "sha256-hq5C6VMnkJ/Y75y7i5ipTUE7s5HsLnmomyFZJlQp/5Y=";
   };
 
-  cargoHash = "sha256-TieiPD2bniFqeTf8FgP8ujQDVWbSiBqsAFkNZkzoFd0=";
+  cargoHash = "sha256-klQa8LB473tB3slDfA7p3SSzXBnzhCRZWeIeHskm71c=";
 
-  # Work around https://github.com/NixOS/nixpkgs/issues/166205.
-  env = lib.optionalAttrs stdenv.cc.isClang {
-    NIX_LDFLAGS = "-l${stdenv.cc.libcxx.cxxabi.libName}";
-  };
+  nativeBuildInputs = [ installShellFiles ];
 
   # error: linker `aarch64-linux-gnu-gcc` not found
   postPatch = ''
     rm .cargo/config.toml
+  '';
+
+  postInstall = ''
+    installShellCompletion --cmd sg \
+      --bash <($out/bin/sg completions bash) \
+      --fish <($out/bin/sg completions fish) \
+      --zsh <($out/bin/sg completions zsh)
   '';
 
   checkFlags = [

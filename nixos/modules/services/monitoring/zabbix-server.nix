@@ -95,11 +95,11 @@ in
 
         port = mkOption {
           type = types.port;
-          default = if cfg.database.type == "mysql" then mysql.port else pgsql.port;
+          default = if cfg.database.type == "mysql" then mysql.port else pgsql.settings.port;
           defaultText = literalExpression ''
             if config.${opt.database.type} == "mysql"
             then config.${options.services.mysql.port}
-            else config.${options.services.postgresql.port}
+            else config.services.postgresql.settings.port
           '';
           description = lib.mdDoc "Database host port.";
         };
@@ -292,10 +292,7 @@ in
         fi
       '' + optionalString (cfg.database.passwordFile != null) ''
         # create a copy of the supplied password file in a format zabbix can consume
-        touch ${passwordFile}
-        chmod 0600 ${passwordFile}
-        echo -n "DBPassword = " > ${passwordFile}
-        cat ${cfg.database.passwordFile} >> ${passwordFile}
+        install -m 0600 <(echo "DBPassword = $(cat ${cfg.database.passwordFile})") ${passwordFile}
       '';
 
       serviceConfig = {

@@ -49,16 +49,16 @@ let
 in
 rustPlatform.buildRustPackage rec {
   pname = "alacritty";
-  version = "0.13.0";
+  version = "0.13.2";
 
   src = fetchFromGitHub {
     owner = "alacritty";
     repo = pname;
     rev = "refs/tags/v${version}";
-    hash = "sha256-5jStrLwuuFWlKHIPS5QJ4DUQj9kXLqlpRxeVDXK/uzU=";
+    hash = "sha256-MrlzAZWLgfwIoTdxY+fjWbrv7tygAjnxXebiEgwOM9A=";
   };
 
-  cargoHash = "sha256-IdkDlxT7pvV+LYbEBsjNvDAWg9TDcmneLF1yrIU3BLU=";
+  cargoHash = "sha256-7HPTELRlmyjj7CXNbgqrzxW548BgbxybWi+tT3rOCX0=";
 
   nativeBuildInputs = [
     cmake
@@ -83,7 +83,7 @@ rustPlatform.buildRustPackage rec {
 
   outputs = [ "out" "terminfo" ];
 
-  postPatch = lib.optionalString (!xdg-utils.meta.broken) ''
+  postPatch = lib.optionalString stdenv.isLinux ''
     substituteInPlace alacritty/src/config/ui_config.rs \
       --replace xdg-open ${xdg-utils}/bin/xdg-open
   '';

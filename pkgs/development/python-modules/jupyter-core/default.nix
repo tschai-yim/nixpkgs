@@ -11,7 +11,7 @@
 
 buildPythonPackage rec {
   pname = "jupyter-core";
-  version = "5.7.0";
+  version = "5.7.2";
   disabled = pythonOlder "3.7";
 
   pyproject = true;
@@ -20,7 +20,7 @@ buildPythonPackage rec {
     owner = "jupyter";
     repo = "jupyter_core";
     rev = "refs/tags/v${version}";
-    hash = "sha256-y3a2pSk+6QNSVg0skosbf6uHSXpvMubyflP6jQleI44=";
+    hash = "sha256-qu25ryZreRPHoubFJTFusGdkTPHbl/yl94g+XU5A5Mc=";
   };
 
   patches = [

@@ -18,8 +18,8 @@
 
 buildPythonPackage rec {
   pname = "pyenphase";
-  version = "1.15.2";
-  format = "pyproject";
+  version = "1.20.1";
+  pyproject = true;
 
   disabled = pythonOlder "3.11";
 
@@ -27,19 +27,19 @@ buildPythonPackage rec {
     owner = "pyenphase";
     repo = "pyenphase";
     rev = "refs/tags/v${version}";
-    hash = "sha256-4vKfgpCo28btFCTbj7xge7bDImafbOWsabhdMJK5p3Q=";
+    hash = "sha256-Bxwd8qHsvq9BuBMSu5JI/Yk/KC5aQ7b7lnXuIoNQ6EI=";
   };
 
   postPatch = ''
     substituteInPlace pyproject.toml \
-      --replace " --cov=pyenphase --cov-report=term-missing:skip-covered" ""
+      --replace-fail " --cov=pyenphase --cov-report=term-missing:skip-covered" ""
   '';
 
-  nativeBuildInputs = [
+  build-system = [
     poetry-core
   ];
 
-  propagatedBuildInputs = [
+  dependencies = [
     awesomeversion
     envoy-utils
     httpx
@@ -68,7 +68,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Library to control enphase envoy";
     homepage = "https://github.com/pyenphase/pyenphase";
-    changelog = "https://github.com/pyenphase/pyenphase/blob/${version}/CHANGELOG.md";
+    changelog = "https://github.com/pyenphase/pyenphase/blob/v${version}/CHANGELOG.md";
     license = licenses.mit;
     maintainers = with maintainers; [ fab ];
   };

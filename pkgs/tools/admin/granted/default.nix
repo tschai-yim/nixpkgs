@@ -12,16 +12,16 @@
 
 buildGoModule rec {
   pname = "granted";
-  version = "0.20.6";
+  version = "0.22.0";
 
   src = fetchFromGitHub {
     owner = "common-fate";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-I+2KAj12iURPRBu2DoQysGcoBz2jooEw8JkB/sJAkkA=";
+    sha256 = "sha256-cN7c5oJAP6ZHjq8o6PZHv40fdjCJtkGbPS2Vh+EWDHw=";
   };
 
-  vendorHash = "sha256-aPOWlXaZjmmj/iQqvlFSVFLQwQsWQ9q8yTElw5KBNIw=";
+  vendorHash = "sha256-lVP32y+XCPaVp8FtnN/13wBXTPQDHupaVw0T/nWtmYo=";
 
   nativeBuildInputs = [ makeWrapper ];
 
@@ -57,7 +57,7 @@ buildGoModule rec {
   '';
 
   meta = with lib; {
-    description = "The easiest way to access your cloud.";
+    description = "The easiest way to access your cloud";
     homepage = "https://github.com/common-fate/granted";
     changelog = "https://github.com/common-fate/granted/releases/tag/${version}";
     license = licenses.mit;

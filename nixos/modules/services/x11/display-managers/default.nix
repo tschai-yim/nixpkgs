@@ -40,7 +40,7 @@ let
         IFS=:
         for i in $XDG_CURRENT_DESKTOP; do
           case $i in
-            KDE|GNOME|X-NIXOS-SYSTEMD-AWARE) echo "1"; exit; ;;
+            KDE|GNOME|Pantheon|X-NIXOS-SYSTEMD-AWARE) echo "1"; exit; ;;
             *) ;;
           esac
         done
@@ -514,7 +514,7 @@ in
 
     # Make xsessions and wayland sessions available in XDG_DATA_DIRS
     # as some programs have behavior that depends on them being present
-    environment.sessionVariables.XDG_DATA_DIRS = [
+    environment.sessionVariables.XDG_DATA_DIRS = lib.mkIf (cfg.displayManager.sessionPackages != [ ]) [
       "${cfg.displayManager.sessionData.desktops}/share"
     ];
   };

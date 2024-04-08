@@ -39,7 +39,7 @@ in
 
       implementation = mkOption {
         type = types.enum [ "dbus" "broker" ];
-        default = "dbus";
+        default = "broker";
         description = lib.mdDoc ''
           The implementation to use for the message bus defined by the D-Bus specification.
           Can be either the classic dbus daemon or dbus-broker, which aims to provide high
@@ -95,10 +95,16 @@ in
         uid = config.ids.uids.messagebus;
         description = "D-Bus system message bus daemon user";
         home = homeDir;
+        homeMode = "0755";
         group = "messagebus";
       };
 
       users.groups.messagebus.gid = config.ids.gids.messagebus;
+
+      # Install dbus for dbus tools even when using dbus-broker
+      environment.systemPackages = [
+        pkgs.dbus
+      ];
 
       # You still need the dbus reference implementation installed to use dbus-broker
       systemd.packages = [
@@ -131,10 +137,6 @@ in
     })
 
     (mkIf (cfg.implementation == "dbus") {
-      environment.systemPackages = [
-        pkgs.dbus
-      ];
-
       security.wrappers.dbus-daemon-launch-helper = {
         source = "${pkgs.dbus}/libexec/dbus-daemon-launch-helper";
         owner = "root";

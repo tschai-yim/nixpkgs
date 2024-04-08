@@ -8,16 +8,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "subxt";
-  version = "0.33.0";
+  version = "0.35.1";
 
   src = fetchFromGitHub {
     owner = "paritytech";
     repo = "subxt";
     rev = "v${version}";
-    hash = "sha256-ZTBWGNbCwe6GyGXk/8QBGLiAp4ZO7VZuJvtZicJsvgA=";
+    hash = "sha256-hv31E0e2ANArrK5VNHwKiEfDvaJojTjBA65oskziLUI=";
   };
 
-  cargoHash = "sha256-FBtwmItzT5uFsKCx36POrYk5qDmlX9Nkx0E3hx17HqI=";
+  cargoHash = "sha256-V7oAvD8M+1CGnXYzj4qeb+skkVROdXr0S5l5mZyLnfA=";
 
   # Only build the command line client
   cargoBuildFlags = [ "--bin" "subxt" ];
@@ -35,6 +35,7 @@ rustPlatform.buildRustPackage rec {
   meta = with lib; {
     homepage = "https://github.com/paritytech/subxt";
     description = "Submit transactions to a substrate node via RPC.";
+    mainProgram = "subxt";
     license = with licenses; [ gpl3Plus asl20 ];
     maintainers = [ maintainers.FlorianFranzen ];
   };

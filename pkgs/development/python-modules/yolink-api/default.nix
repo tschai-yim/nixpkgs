@@ -1,33 +1,32 @@
-{ lib
-, aiohttp
-, aiomqtt
-, buildPythonPackage
-, fetchFromGitHub
-, pydantic
-, pythonOlder
-, setuptools
-, tenacity
+{
+  lib,
+  aiohttp,
+  aiomqtt,
+  buildPythonPackage,
+  fetchFromGitHub,
+  pydantic,
+  pythonOlder,
+  setuptools,
+  tenacity,
 }:
 
 buildPythonPackage rec {
   pname = "yolink-api";
-  version = "0.3.4";
-  format = "pyproject";
+  version = "0.4.2";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "YoSmart-Inc";
-    repo = pname;
+    repo = "yolink-api";
     rev = "refs/tags/v${version}";
-    hash = "sha256-wDZlzl178SIXxo5SacbbXWHhF4wOsjBU4a9h0jBYA4c=";
+    hash = "sha256-De3uMrLAz8LdX2pU5pn+6W6UvB+M9fSv80RSjgleo3M=";
   };
 
-  nativeBuildInputs = [
-    setuptools
-  ];
+  build-system = [ setuptools ];
 
-  propagatedBuildInputs = [
+  dependencies = [
     aiohttp
     aiomqtt
     pydantic
@@ -37,9 +36,7 @@ buildPythonPackage rec {
   # Module has no tests
   doCheck = false;
 
-  pythonImportsCheck = [
-    "yolink"
-  ];
+  pythonImportsCheck = [ "yolink" ];
 
   meta = with lib; {
     description = "Library to interface with Yolink";

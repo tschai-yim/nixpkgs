@@ -18,37 +18,39 @@
 , libpng
 , python3
 , zlib
+, simde
 , bashInteractive
 , zsh
 , fish
 , nixosTests
-, go
-, buildGoModule
+, go_1_22
+, buildGo122Module
 , nix-update-script
 }:
 
 with python3Packages;
 buildPythonApplication rec {
   pname = "kitty";
-  version = "0.31.0";
+  version = "0.33.1";
   format = "other";
 
   src = fetchFromGitHub {
     owner = "kovidgoyal";
     repo = "kitty";
     rev = "refs/tags/v${version}";
-    hash = "sha256-VWWuC4T0pyTgqPNm0gNL1j3FShU5b8S157C1dKLon1g=";
+    hash = "sha256-E6gFGgySXs2oCS4Ipevbr9aPWzF4tb4Arl4w+4lQ+wg=";
   };
 
-  goModules = (buildGoModule {
+  goModules = (buildGo122Module {
     pname = "kitty-go-modules";
     inherit src version;
-    vendorHash = "sha256-OyZAWefSIiLQO0icxMIHWH3BKgNas8HIxLcse/qWKcU=";
+    vendorHash = "sha256-ypSZHJpk9wTXLH9sbmaSQB28iOIpv2nDPlgweM0Ldhs=";
   }).goModules;
 
   buildInputs = [
     harfbuzz
     ncurses
+    simde
     lcms2
     librsync
     openssl.dev
@@ -78,7 +80,7 @@ buildPythonApplication rec {
     sphinx-copybutton
     sphinxext-opengraph
     sphinx-inline-tabs
-    go
+    go_1_22
   ] ++ lib.optionals stdenv.isDarwin [
     imagemagick
     libicns  # For the png2icns tool.
@@ -232,7 +234,9 @@ buildPythonApplication rec {
   '';
 
   passthru = {
-    tests.test = nixosTests.terminal-emulators.kitty;
+    tests = lib.optionalAttrs stdenv.isLinux {
+      default = nixosTests.terminal-emulators.kitty;
+    };
     updateScript = nix-update-script {};
   };
 
@@ -240,7 +244,10 @@ buildPythonApplication rec {
     homepage = "https://github.com/kovidgoyal/kitty";
     description = "A modern, hackable, featureful, OpenGL based terminal emulator";
     license = licenses.gpl3Only;
-    changelog = "https://sw.kovidgoyal.net/kitty/changelog/";
+    changelog = [
+      "https://sw.kovidgoyal.net/kitty/changelog/"
+      "https://github.com/kovidgoyal/kitty/blob/v${version}/docs/changelog.rst"
+    ];
     platforms = platforms.darwin ++ platforms.linux;
     mainProgram = "kitty";
     maintainers = with maintainers; [ tex rvolosatovs Luflosi adamcstephens kashw2 ];

@@ -9,7 +9,6 @@ with lib;
 let
   cfg = config.services.kea;
 
-  xor = x: y: (!x && y) || (x && !y);
   format = pkgs.formats.json {};
 
   chooseNotNull = x: y: if x != null then x else y;
@@ -325,6 +324,9 @@ in
         "network-online.target"
         "time-sync.target"
       ];
+      wants = [
+        "network-online.target"
+      ];
       wantedBy = [
         "multi-user.target"
       ];
@@ -372,6 +374,9 @@ in
         "network-online.target"
         "time-sync.target"
       ];
+      wants = [
+        "network-online.target"
+      ];
       wantedBy = [
         "multi-user.target"
       ];
@@ -413,6 +418,7 @@ in
         "https://kea.readthedocs.io/en/kea-${package.version}/arm/ddns.html"
       ];
 
+      wants = [ "network-online.target" ];
       after = [
         "network-online.target"
         "time-sync.target"

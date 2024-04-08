@@ -2,7 +2,6 @@
 , buildPythonPackage
 , fetchPypi
 , setuptools
-, wheel
 , botocore-stubs
 , typing-extensions
 , types-aiobotocore-accessanalyzer
@@ -364,20 +363,19 @@
 
 buildPythonPackage rec {
   pname = "types-aiobotocore";
-  version = "2.9.0";
+  version = "2.12.2";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-QSZDFXiVEXFHTE7FrLZVUeLOOyPTG96PIMg9lziiwDc=";
+    hash = "sha256-cpw68B9rX30QE+pbfSRV00wg05XZuKmSYNdJ53uo7+M=";
   };
 
-  nativeBuildInputs = [
+  build-system = [
     setuptools
-    wheel
   ];
 
-  propagatedBuildInputs = [
+  dependencies = [
     botocore-stubs
     typing-extensions
   ];

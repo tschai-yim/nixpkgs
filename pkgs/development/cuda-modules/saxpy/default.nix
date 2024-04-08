@@ -1,11 +1,11 @@
 {
+  autoAddDriverRunpath,
   cmake,
   cudaPackages,
   lib,
 }:
 let
   inherit (cudaPackages)
-    autoAddOpenGLRunpathHook
     backendStdenv
     cuda_cccl
     cuda_cudart
@@ -16,6 +16,7 @@ let
     libcublas
     setupCudaHook
     ;
+  inherit (lib) getDev getLib getOutput;
 in
 backendStdenv.mkDerivation {
   pname = "saxpy";
@@ -28,18 +29,20 @@ backendStdenv.mkDerivation {
   nativeBuildInputs =
     [
       cmake
-      autoAddOpenGLRunpathHook
+      autoAddDriverRunpath
     ]
-    ++ lib.optionals (lib.versionOlder cudaVersion "11.4") [cudatoolkit]
-    ++ lib.optionals (lib.versionAtLeast cudaVersion "11.4") [cuda_nvcc];
+    ++ lib.optionals (lib.versionOlder cudaVersion "11.4") [ cudatoolkit ]
+    ++ lib.optionals (lib.versionAtLeast cudaVersion "11.4") [ cuda_nvcc ];
 
   buildInputs =
-    lib.optionals (lib.versionOlder cudaVersion "11.4") [cudatoolkit]
+    lib.optionals (lib.versionOlder cudaVersion "11.4") [ cudatoolkit ]
     ++ lib.optionals (lib.versionAtLeast cudaVersion "11.4") [
-      libcublas
+      (getDev libcublas)
+      (getLib libcublas)
+      (getOutput "static" libcublas)
       cuda_cudart
     ]
-    ++ lib.optionals (lib.versionAtLeast cudaVersion "12.0") [cuda_cccl];
+    ++ lib.optionals (lib.versionAtLeast cudaVersion "12.0") [ cuda_cccl ];
 
   cmakeFlags = [
     (lib.cmakeBool "CMAKE_VERBOSE_MAKEFILE" true)
@@ -48,10 +51,11 @@ backendStdenv.mkDerivation {
     ))
   ];
 
-  meta = {
+  meta = rec {
     description = "A simple (Single-precision AX Plus Y) FindCUDAToolkit.cmake example for testing cross-compilation";
     license = lib.licenses.mit;
     maintainers = lib.teams.cuda.members;
     platforms = lib.platforms.unix;
+    badPlatforms = lib.optionals flags.isJetsonBuild platforms;
   };
 }

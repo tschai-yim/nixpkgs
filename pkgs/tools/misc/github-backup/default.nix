@@ -7,12 +7,12 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "github-backup";
-  version = "0.44.1";
+  version = "0.45.1";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-tOCIrquhBS7aNeFocu8M9JV19vfFwrfIsaaePCp2vPw=";
+    hash = "sha256-+dQVewMHSF0SnOKmgwc9pmqXAJGLjSqwS9YQHdvEmKo=";
   };
 
   nativeBuildInputs = with python3.pkgs; [

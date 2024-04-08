@@ -164,7 +164,10 @@ in
     systemd.services.cloud-init-local = {
       description = "Initial cloud-init job (pre-networking)";
       wantedBy = [ "multi-user.target" ];
-      before = [ "systemd-networkd.service" ];
+      # In certain environments (AWS for example), cloud-init-local will
+      # first configure an IP through DHCP, and later delete it.
+      # This can cause race conditions with anything else trying to set IP through DHCP.
+      before = [ "systemd-networkd.service" "dhcpcd.service" ];
       path = path;
       serviceConfig = {
         Type = "oneshot";
@@ -201,7 +204,7 @@ in
       description = "Apply the settings specified in cloud-config";
       wantedBy = [ "multi-user.target" ];
       wants = [ "network-online.target" ];
-      after = [ "network-online.target" "syslog.target" "cloud-config.target" ];
+      after = [ "network-online.target" "cloud-config.target" ];
 
       path = path;
       serviceConfig = {
@@ -217,7 +220,7 @@ in
       description = "Execute cloud user/final scripts";
       wantedBy = [ "multi-user.target" ];
       wants = [ "network-online.target" ];
-      after = [ "network-online.target" "syslog.target" "cloud-config.service" "rc-local.service" ];
+      after = [ "network-online.target" "cloud-config.service" "rc-local.service" ];
       requires = [ "cloud-config.target" ];
       path = path;
       serviceConfig = {

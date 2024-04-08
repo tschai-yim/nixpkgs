@@ -12,7 +12,7 @@
 
 let
   pname = "ockam";
-  version = "0.114.0";
+  version = "0.119.0";
 in
 rustPlatform.buildRustPackage {
   inherit pname version;
@@ -21,10 +21,10 @@ rustPlatform.buildRustPackage {
     owner = "build-trust";
     repo = pname;
     rev = "ockam_v${version}";
-    sha256 = "sha256-oR5SzLPJ4I87bMyHTwd+Vjm7pR+modBGIEqls9s6hVI=";
+    hash = "sha256-gZBlh8Rg6lChcvTBRzPDIQk2wEJep/3Hei9xaIi8cZo=";
   };
 
-  cargoHash = "sha256-m86NT3O1PbTWxc0Q5pqkLECHHKtF4w8Vl5eDpvxjDHs=";
+  cargoHash = "sha256-0WzX6WsgUWGsToIX3cbiax4crhTbYuWI6EIF2xQWTxU=";
   nativeBuildInputs = [ git pkg-config ];
   buildInputs = [ openssl dbus ]
     ++ lib.optionals stdenv.isDarwin [ Security ];
@@ -53,9 +53,8 @@ rustPlatform.buildRustPackage {
   #   "--skip=util::tests::test_process_multi_addr"
   # ];
 
-
   meta = with lib; {
-    description = "Orchestrate end-to-end encryption, cryptographic identities, mutual authentication, and authorization policies between distributed applications – at massive scale. Use Ockam to build secure-by-design applications that can Trust Data-in-Motion.";
+    description = "Orchestrate end-to-end encryption, cryptographic identities, mutual authentication, and authorization policies between distributed applications – at massive scale";
     homepage = "https://github.com/build-trust/ockam";
     license = licenses.mpl20;
     maintainers = with maintainers; [ happysalada ];

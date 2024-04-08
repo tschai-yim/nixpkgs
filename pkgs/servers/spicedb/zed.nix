@@ -5,19 +5,20 @@
 
 buildGoModule rec {
   pname = "zed";
-  version = "0.15.2";
+  version = "0.17.1";
 
   src = fetchFromGitHub {
     owner = "authzed";
     repo = "zed";
     rev = "v${version}";
-    hash = "sha256-e9jgRvQ8eYy6eqweqQIyjEKZ4cfEq5DwGXBvBXB2Wk8=";
+    hash = "sha256-Bbh57UQRB/G5r4FoExp+cJyraTM/jBf87Ylt4BgPVdQ=";
   };
 
-  vendorHash = "sha256-VRWhhXgBnIkwkakhERm2iSKidPnk0e4iTXXJpJz4cRM=";
+  vendorHash = "sha256-AKp7A9WnN9fSGqr4fU53e1/rzBgbV4DJIZKxLms2WDk=";
 
   meta = with lib; {
     description = "Command line for managing SpiceDB";
+    mainProgram = "zed";
     longDescription = ''
       SpiceDB is an open-source permissions database inspired by
       Google Zanzibar. zed is the command line client for SpiceDB.

@@ -328,15 +328,24 @@ rec {
           "signedInt${toString bit}" "${toString bit} bit signed integer";
 
       in {
-        /* An int with a fixed range.
-        *
-        * Example:
-        *   (ints.between 0 100).check (-1)
-        *   => false
-        *   (ints.between 0 100).check (101)
-        *   => false
-        *   (ints.between 0 0).check 0
-        *   => true
+        # TODO: Deduplicate with docs in nixos/doc/manual/development/option-types.section.md
+        /**
+          An int with a fixed range.
+
+          # Example
+          :::{.example}
+          ## `lib.types.ints.between` usage example
+
+          ```nix
+          (ints.between 0 100).check (-1)
+          => false
+          (ints.between 0 100).check (101)
+          => false
+          (ints.between 0 0).check 0
+          => true
+          ```
+
+          :::
         */
         inherit between;
 
@@ -557,6 +566,7 @@ rec {
       in list // {
         description = "non-empty ${optionDescriptionPhrase (class: class == "noun") list}";
         emptyValue = { }; # no .value attr, meaning unset
+        substSubModules = m: nonEmptyListOf (elemType.substSubModules m);
       };
 
     attrsOf = elemType: mkOptionType rec {
@@ -613,23 +623,12 @@ rec {
       nestedTypes.elemType = elemType;
     };
 
-    # Value of given type but with no merging (i.e. `uniq list`s are not concatenated).
-    uniq = elemType: mkOptionType rec {
-      name = "uniq";
-      inherit (elemType) description descriptionClass check;
-      merge = mergeOneOption;
-      emptyValue = elemType.emptyValue;
-      getSubOptions = elemType.getSubOptions;
-      getSubModules = elemType.getSubModules;
-      substSubModules = m: uniq (elemType.substSubModules m);
-      functor = (defaultFunctor name) // { wrapped = elemType; };
-      nestedTypes.elemType = elemType;
-    };
+    uniq = unique { message = ""; };
 
     unique = { message }: type: mkOptionType rec {
       name = "unique";
       inherit (type) description descriptionClass check;
-      merge = mergeUniqueOption { inherit message; };
+      merge = mergeUniqueOption { inherit message; inherit (type) merge; };
       emptyValue = type.emptyValue;
       getSubOptions = type.getSubOptions;
       getSubModules = type.getSubModules;

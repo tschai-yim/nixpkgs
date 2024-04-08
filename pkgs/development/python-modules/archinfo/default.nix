@@ -9,23 +9,23 @@
 
 buildPythonPackage rec {
   pname = "archinfo";
-  version = "9.2.83";
+  version = "9.2.97";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "angr";
-    repo = pname;
+    repo = "archinfo";
     rev = "refs/tags/v${version}";
-    hash = "sha256-vZajNUc+bgULs6bvX9g/VE3pJCvQUlPGD/h0FmLsLHE=";
+    hash = "sha256-X8rMTQvNolYjSPyXbP2i5MYTPEvQlwoUQmXeEW56wQs=";
   };
 
-  nativeBuildInputs = [
+  build-system = [
     setuptools
   ];
 
-  propagatedBuildInputs = lib.optionals (pythonOlder "3.11") [
+  dependencies = lib.optionals (pythonOlder "3.11") [
     backports-strenum
   ];
 

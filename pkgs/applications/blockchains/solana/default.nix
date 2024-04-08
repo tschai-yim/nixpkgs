@@ -18,22 +18,11 @@
     "solana-gossip"
     "solana-install"
     "solana-keygen"
+    "solana-ledger-tool"
     "solana-log-analyzer"
     "solana-net-shaper"
-    "solana-sys-tuner"
-    "rbpf-cli"
     "solana-validator"
-    "solana-ledger-tool"
-    "cargo-build-bpf"
-    "cargo-test-bpf"
-    "solana-dos"
-    "solana-install-init"
-    "solana-stake-accounts"
     "solana-test-validator"
-    "solana-tokens"
-    "solana-watchtower"
-    "cargo-test-sbf"
-    "cargo-build-sbf"
 ] ++ [
     # XXX: Ensure `solana-genesis` is built LAST!
     # See https://github.com/solana-labs/solana/issues/5826
@@ -41,22 +30,30 @@
   ]
 }:
 let
-  version = "1.14.23";
-  sha256 = "sha256-NUkkLzLNh8P7PFh/SVtd9JM18w3egDaaK80urGw1SSs=";
-  cargoSha256 = "sha256-7t8Quh6T2MzJWEM5Y50CgCyFfx2ZJRAdCpZyyYvJrt4=";
+  version = "1.17.28";
+  sha256 = "y79zsUfYsX377ofsFSg9a2il99uJsA+qdCu3J+EU5nQ=";
 
   inherit (darwin.apple_sdk_11_0) Libsystem;
   inherit (darwin.apple_sdk_11_0.frameworks) System IOKit AppKit Security;
 in
 rustPlatform.buildRustPackage rec {
   pname = "solana-cli";
-  inherit version cargoSha256;
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "solana-labs";
     repo = "solana";
     rev = "v${version}";
     inherit sha256;
+  };
+
+  cargoLock = {
+    lockFile = ./Cargo.lock;
+
+    outputHashes = {
+      "crossbeam-epoch-0.9.5" = "sha256-Jf0RarsgJiXiZ+ddy0vp4jQ59J9m0k3sgXhWhCdhgws=";
+      "tokio-1.29.1" = "sha256-Z/kewMCqkPVTXdoBcSaFKG5GSQAdkdpj3mAzLLCjjGk=";
+    };
   };
 
   strictDeps = true;
@@ -101,7 +98,7 @@ rustPlatform.buildRustPackage rec {
     description = "Web-Scale Blockchain for fast, secure, scalable, decentralized apps and marketplaces. ";
     homepage = "https://solana.com";
     license = licenses.asl20;
-    maintainers = with maintainers; [ netfox happysalada ];
+    maintainers = with maintainers; [ netfox happysalada aikooo7 ];
     platforms = platforms.unix;
   };
 

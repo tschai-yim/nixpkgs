@@ -1,25 +1,27 @@
 { lib
 , buildNpmPackage
 , fetchFromGitHub
-, nodejs_18
+, systemdMinimal
 , nixosTests
 , nix-update-script
 }:
 
 buildNpmPackage rec {
   pname = "zigbee2mqtt";
-  version = "1.35.0";
+  version = "1.36.1";
 
   src = fetchFromGitHub {
     owner = "Koenkk";
     repo = "zigbee2mqtt";
     rev = version;
-    hash = "sha256-0swbnT+iQqX1jQ1INJmG2zSgiu4pM7zu0ieBkpUE9zg=";
+    hash = "sha256-LZ25EWO4cOVnF0bWFKwGfnX7kpzNafp1X6+/JYxn6Ek=";
   };
 
-  npmDepsHash = "sha256-VXdu5IKUao0mFO0Wzev99LmhZSaGn/04cSexa6EHSrg=";
+  npmDepsHash = "sha256-6EorAqPLusWAEfTePn+O+tgZcv3g82mkPs2hSHPRRfo=";
 
-  nodejs = nodejs_18;
+  buildInputs = [
+    systemdMinimal
+  ];
 
   passthru.tests.zigbee2mqtt = nixosTests.zigbee2mqtt;
   passthru.updateScript = nix-update-script { };

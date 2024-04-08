@@ -18,8 +18,8 @@
 
 buildPythonPackage rec {
   pname = "rapidfuzz";
-  version = "3.5.2";
-  format = "pyproject";
+  version = "3.7.0";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
@@ -27,8 +27,13 @@ buildPythonPackage rec {
     owner = "maxbachmann";
     repo = "RapidFuzz";
     rev = "refs/tags/v${version}";
-    hash = "sha256-D7Z0xKqAJAPKSAEK+3Mpz/LaEKqKYczp+m6SqfzufwA=";
+    hash = "sha256-BwU9Ti35Dsaa+kT78h3lsjw4sI1RQdhukTPTeJDyBw0=";
   };
+
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace-fail "Cython >=3.0.9, <3.1.0" "Cython"
+  '';
 
   nativeBuildInputs = [
     cmake

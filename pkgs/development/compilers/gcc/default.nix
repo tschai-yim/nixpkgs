@@ -103,6 +103,7 @@ let inherit version;
     disableBootstrap = atLeast11 && !stdenv.hostPlatform.isDarwin && (atLeast12 -> !profiledCompiler);
 
     inherit (stdenv) buildPlatform hostPlatform targetPlatform;
+    targetConfig = if targetPlatform != hostPlatform then targetPlatform.config else null;
 
     patches = callFile ./patches {};
 
@@ -124,6 +125,7 @@ let inherit version;
         buildPlatform
         hostPlatform
         targetPlatform
+        targetConfig
         patches
         crossMingw
         stageNameAddon
@@ -329,7 +331,7 @@ lib.pipe ((callFile ./common/builder.nix {}) ({
     ++ optional (is7 && targetPlatform.isAarch64) "--enable-fix-cortex-a53-843419"
     ++ optional (is7 && targetPlatform.isNetBSD) "--disable-libcilkrts";
 
-  targetConfig = if targetPlatform != hostPlatform then targetPlatform.config else null;
+  inherit targetConfig;
 
   buildFlags =
     # we do not yet have Nix-driven profiling
@@ -406,8 +408,10 @@ lib.pipe ((callFile ./common/builder.nix {}) ({
   passthru = {
     inherit langC langCC langObjC langObjCpp langAda langFortran langGo langD langJava version;
     isGNU = true;
-  } // lib.optionalAttrs (!atLeast12) {
-    hardeningUnsupportedFlags = lib.optionals is48 [ "stackprotector" ] ++ [ "fortify3" ];
+    hardeningUnsupportedFlags = lib.optional is48 "stackprotector"
+      ++ lib.optional (!atLeast11) "zerocallusedregs"
+      ++ lib.optionals (!atLeast12) [ "fortify3" "trivialautovarinit" ]
+      ++ lib.optionals (langFortran) [ "fortify" "format" ];
   };
 
   enableParallelBuilding = true;

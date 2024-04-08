@@ -1,15 +1,15 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, pythonOlder
-, setuptools
-, wheel
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  pythonOlder,
+  setuptools,
 }:
 
 buildPythonPackage rec {
   pname = "pyduotecno";
-  version = "2024.1.1";
-  format = "pyproject";
+  version = "2024.3.2";
+  pyproject = true;
 
   disabled = pythonOlder "3.9";
 
@@ -17,20 +17,15 @@ buildPythonPackage rec {
     owner = "Cereal2nd";
     repo = "pyDuotecno";
     rev = "refs/tags/${version}";
-    hash = "sha256-+mPbx678QIV567umbmVKqBTq696pFlFXhlb4cMv54ak=";
+    hash = "sha256-aak1e8NOxj7kncOyChpCEAQP1jpduhiSKDqm3mf5bqs=";
   };
 
-  nativeBuildInputs = [
-    setuptools
-    wheel
-  ];
+  build-system = [ setuptools ];
 
   # Module has no tests
   doCheck = false;
 
-  pythonImportsCheck = [
-    "duotecno"
-  ];
+  pythonImportsCheck = [ "duotecno" ];
 
   meta = with lib; {
     description = "Module to interact with Duotecno IP interfaces";

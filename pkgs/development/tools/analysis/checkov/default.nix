@@ -1,39 +1,50 @@
-{ lib
-, fetchFromGitHub
-, python3
+{
+  lib,
+  fetchFromGitHub,
+  python3,
 }:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "checkov";
-  version = "3.1.46";
+  version = "3.2.53";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "bridgecrewio";
     repo = "checkov";
     rev = "refs/tags/${version}";
-    hash = "sha256-scGZtqAdAjRD0bNq9pWp699I9rxPh2CFP4lCz+1yAZ8=";
+    hash = "sha256-fldD2V/Qlwg6tvl3IxdLEzc2meWToIeGHQCsMM+b2vI=";
   };
 
-  patches = [
-    ./flake8-compat-5.x.patch
-  ];
+  patches = [ ./flake8-compat-5.x.patch ];
 
   pythonRelaxDeps = [
+    "boto3"
+    "botocore"
     "bc-detect-secrets"
     "bc-python-hcl2"
     "dpath"
+    "igraph"
     "license-expression"
     "networkx"
+    "openai"
+    "packageurl-python"
+    "packaging"
+    "pycep-parser"
+    "termcolor"
+  ];
+
+  pythonRemoveDeps = [
+    # pythonRelaxDeps doesn't work with that one
     "pycep-parser"
   ];
 
-  nativeBuildInputs = with python3.pkgs; [
+  build-system = with python3.pkgs; [
     pythonRelaxDepsHook
     setuptools-scm
   ];
 
-  propagatedBuildInputs = with python3.pkgs; [
+  dependencies = with python3.pkgs; [
     aiodns
     aiohttp
     aiomultiprocess
@@ -73,7 +84,7 @@ python3.pkgs.buildPythonApplication rec {
     termcolor
     tqdm
     typing-extensions
-    update_checker
+    update-checker
   ];
 
   nativeCheckInputs = with python3.pkgs; [
@@ -134,9 +145,7 @@ python3.pkgs.buildPythonApplication rec {
     "dogfood_tests/test_checkov_dogfood.py"
   ];
 
-  pythonImportsCheck = [
-    "checkov"
-  ];
+  pythonImportsCheck = [ "checkov" ];
 
   postInstall = ''
     chmod +x $out/bin/checkov
@@ -151,6 +160,9 @@ python3.pkgs.buildPythonApplication rec {
       Kubernetes, Serverless framework and other infrastructure-as-code-languages.
     '';
     license = licenses.asl20;
-    maintainers = with maintainers; [ anhdle14 fab ];
+    maintainers = with maintainers; [
+      anhdle14
+      fab
+    ];
   };
 }
